@@ -13,6 +13,7 @@ if (process.env.NODE_ENV === "development") {
 // Body parser
 app.use(express.json());
 
+// serve static files
 app.use(express.static(`${__dirname}/public`));
 
 // Routes middleware
