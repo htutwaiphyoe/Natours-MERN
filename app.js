@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use(express.static(`${__dirname}/public`));
 
+// Routes middleware
 app.use("/api/v2/users", UserRouter);
 app.use("/api/v2/tours", TourRouter);
 
