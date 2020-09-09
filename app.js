@@ -16,9 +16,12 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use("/api/v2/users", UserRouter);
 app.use("/api/v2/tours", TourRouter);
+
+// handling unhandled routes
 app.all("*", (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} in this page`, 404));
 });
 
+// global error handling middleware
 app.use(ErrorController);
 module.exports = app;
