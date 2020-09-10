@@ -39,6 +39,7 @@ module.exports = (err, req, res, next) => {
     if (process.env.NODE_ENV !== "production") {
         sendDevErrors(err, res);
     } else {
+        // mongoose give error name for each error
         if (err.name === "CastError") {
             // creating own error to make isOperational to equal to true
             err = castErrorHandler(err);
