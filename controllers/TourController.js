@@ -1,6 +1,7 @@
 const Tour = require("../models/TourModel");
 const APIFeatures = require("../utils/apiFeatures");
 const errorHandler = require("../utils/errorHandler");
+const AppError = require("../utils/AppError");
 
 exports.getTopFiveTours = (req, res, next) => {
     req.query.limit = 5;
@@ -39,6 +40,10 @@ exports.addNewTour = errorHandler(async (req, res, next) => {
 
 exports.getSingleTour = errorHandler(async (req, res, next) => {
     const tour = await Tour.findById(req.params.id);
+
+    if (!tour) {
+        return next(new AppError("No tour found", 404));
+    }
     res.status(200).json({
         status: "success",
         data: {
@@ -52,7 +57,9 @@ exports.updateSingleTour = errorHandler(async (req, res, next) => {
         new: true,
         runValidators: true,
     });
-
+    if (!updatedTour) {
+        return next(new AppError("No tour found", 404));
+    }
     res.status(200).json({
         status: "success",
         data: {
@@ -62,7 +69,11 @@ exports.updateSingleTour = errorHandler(async (req, res, next) => {
 });
 
 exports.deleteSingleTour = errorHandler(async (req, res, next) => {
-    await Tour.findByIdAndDelete(req.params.id);
+    const tour = await Tour.findByIdAndDelete(req.params.id);
+
+    if (!tour) {
+        return next(new AppError("No tour found", 404));
+    }
     res.status(204).json({
         status: "success",
         data: null,
