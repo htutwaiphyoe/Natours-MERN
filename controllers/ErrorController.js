@@ -40,6 +40,7 @@ module.exports = (err, req, res, next) => {
         sendDevErrors(err, res);
     } else {
         if (err.name === "CastError") {
+            // creating own error to make isOperational to equal to true
             err = castErrorHandler(err);
         }
         sendProdErrors(err, res);
