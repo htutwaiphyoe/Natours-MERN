@@ -2,8 +2,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
 process.on("uncaughtException", (err) => {
-    console.error("Internal Server Error");
-
+    console.error(err.message);
     process.exit(1);
 });
 
