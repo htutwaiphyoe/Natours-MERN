@@ -15,9 +15,15 @@ mongoose
     })
     .then(() => {
         console.log("Database connected successfully");
-    })
-    .catch((err) => console.log(err));
+    });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log("Server listening");
+});
+
+process.on("unhandledRejection", () => {
+    console.log("Internal Server Error");
+    server.close(() => {
+        process.exit(1);
+    });
 });
