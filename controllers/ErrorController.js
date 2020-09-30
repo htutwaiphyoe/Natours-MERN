@@ -8,6 +8,11 @@ const duplicateErrorHandler = (err) => {
     const field = err.message.match(/(?<=(["']))(?:(?=(\\?))\2.)*?(?=\1)/)[0];
     return new AppError(`Duplicate field value: ${field}`, 400);
 };
+
+const validationErrorHandler = (err) => {
+    const errors = Object.values(err.errors).map((el) => el.message);
+    return new AppError(`${errors.join(". ")}`, 400);
+};
 const sendDevErrors = (err, res) => {
     res.status(err.statusCode).json({
         status: err.status,
@@ -52,6 +57,9 @@ module.exports = (err, req, res, next) => {
         }
         if (err.code === 11000) {
             err = duplicateErrorHandler(err);
+        }
+        if (err.name === "ValidationError") {
+            err = validationErrorHandler(err);
         }
         sendProdErrors(err, res);
     }
