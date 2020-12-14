@@ -1,1 +1,1 @@
-# Natours
+# Natours - Node.js Application
