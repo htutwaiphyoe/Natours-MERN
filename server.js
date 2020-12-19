@@ -22,36 +22,6 @@ mongoose.connection.on("error", (err) => {
     console.log("Database connection failed");
 });
 
-const tourSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: [true, "Missing name"],
-        unique: true,
-    },
-    price: {
-        type: Number,
-        required: [true, "Missing price"],
-    },
-    rating: {
-        type: Number,
-        default: 4.5,
-    },
-});
-
-const Tour = mongoose.model("Tour", tourSchema);
-
-const tour = new Tour({
-    name: "Test 2",
-});
-
-tour.save()
-    .then(() => {
-        console.log("Tour saved");
-    })
-    .catch((err) => {
-        console.log(err.message);
-    });
-
 // Server configuration
 const port = process.env.PORT || 8000;
 app.listen(port, () => {});
