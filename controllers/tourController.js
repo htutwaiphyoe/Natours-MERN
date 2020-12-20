@@ -12,30 +12,20 @@ exports.getAllTours = async (req, res) => {
 };
 
 exports.addNewTour = async (req, res) => {
-    //     const tour = {
-    //         id: tours.length,
-    //         ...req.body,
-    //     };
-    //     tours.push(tour);
-    //     fs.writeFile(
-    //         `${__dirname}/../dev-data/data/tours-simple.json`,
-    //         JSON.stringify(tours),
-    //         "utf-8",
-    //         (err) => {
-    //             if (err) {
-    //                 return res.status(500).json({
-    //                     status: "error",
-    //                     message: "Internal server error",
-    //                 });
-    //             }
-    //             res.status(201).json({
-    //                 status: "success",
-    //                 data: {
-    //                     tour,
-    //                 },
-    //             });
-    //         }
-    //     );
+    try {
+        const tour = await Tour.create(req.body);
+        res.status(201).json({
+            status: "success",
+            data: {
+                tour,
+            },
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "error",
+            message: err.message,
+        });
+    }
 };
 exports.getSingleTour = (req, res) => {
     res.status(200).json({
