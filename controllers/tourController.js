@@ -13,7 +13,14 @@ exports.getAllTours = async (req, res) => {
             JSON.stringify(urlQuery).replace(/\b(gt|lt|gte|lte|ne)\b/g, (match) => `$${match}`)
         );
         console.log(urlQuery, req.query);
-        const query = Tour.find(urlQuery);
+        let query = Tour.find(urlQuery);
+
+        // sorting
+        if (req.query.sort) {
+            query = query.sort(req.query.sort.split(",").join(" "));
+        } else {
+            query = query.sort("-createdAt");
+        }
         const tours = await query;
         res.status(200).json({
             status: "success",
