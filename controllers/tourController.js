@@ -71,23 +71,17 @@ exports.updateSingleTour = async (req, res) => {
     }
 };
 
-exports.deleteSingleTour = (req, res) => {
-    // tours = tours.filter((tour) => tour.id !== +req.params.id);
-    // fs.writeFile(
-    //     `${__dirname}/../dev-data/data/tours-simple.json`,
-    //     JSON.stringify(tours),
-    //     "utf-8",
-    //     (err) => {
-    //         if (err) {
-    //             return res.status(500).json({
-    //                 status: "fail",
-    //                 message: "Server error",
-    //             });
-    //         }
-    //         res.status(204).json({
-    //             status: "success",
-    //             data: null,
-    //         });
-    //     }
-    // );
+exports.deleteSingleTour = async (req, res) => {
+    try {
+        await Tour.findByIdAndDelete(req.params.id);
+        res.status(204).json({
+            status: "success",
+            data: null,
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "error",
+            message: err.message,
+        });
+    }
 };
