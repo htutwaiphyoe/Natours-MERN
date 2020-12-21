@@ -57,6 +57,10 @@ const tourSchema = new mongoose.Schema(
             default: Date.now(),
             select: false,
         },
+        secret: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         toObject: { virtuals: true },
@@ -70,6 +74,11 @@ tourSchema.virtual("durationInWeeks").get(function () {
 
 tourSchema.pre("save", function (next) {
     this.slug = this.name.split(" ").join("-").toLowerCase();
+    next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+    this.find({ secret: { $ne: true } });
     next();
 });
 const Tour = mongoose.model("Tour", tourSchema);
