@@ -9,6 +9,7 @@ const tourSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
+        slug: String,
         duration: {
             type: Number,
             required: [true, "Missing duration"],
@@ -65,6 +66,11 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual("durationInWeeks").get(function () {
     return (this.duration / 7).toFixed(1);
+});
+
+tourSchema.pre("save", function (next) {
+    this.slug = this.name.split(" ").join("-").toLowerCase();
+    next();
 });
 const Tour = mongoose.model("Tour", tourSchema);
 
