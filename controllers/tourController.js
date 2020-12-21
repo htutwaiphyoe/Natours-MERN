@@ -1,5 +1,6 @@
 // Core modules
 const Tour = require("../models/TourModel");
+const APIFeatures = require("../utils/APIFeatures");
 
 exports.getTop5 = (req, res, next) => {
     req.query.limit = "5";
@@ -9,40 +10,14 @@ exports.getTop5 = (req, res, next) => {
 };
 exports.getAllTours = async (req, res) => {
     try {
-        // Filtering
-        let urlQuery = { ...req.query };
-        const excludedFields = ["limit", "sort", "page", "fields"];
-        excludedFields.forEach((field) => delete urlQuery[field]);
-
-        // Advenced filtering
-        urlQuery = JSON.parse(
-            JSON.stringify(urlQuery).replace(/\b(gt|lt|gte|lte|ne)\b/g, (match) => `$${match}`)
-        );
-        console.log(urlQuery, req.query);
-        let query = Tour.find(urlQuery);
-
-        // sorting
-        if (req.query.sort) {
-            query = query.sort(req.query.sort.split(",").join(" "));
-        } else {
-            query = query.sort("-createdAt");
-        }
-
-        // fields limiting
-        if (req.query.fields) {
-            query = query.select(req.query.fields.split(",").join(" "));
-        } else {
-            query = query.select("-__v");
-        }
-
-        // pagination
-        const page = +req.query.page || 1;
-        const limit = +req.query.limit || 10;
-        const skip = (page - 1) * limit;
-        query = query.skip(skip).limit(limit);
-
+        // get query
+        const apiFeatures = new APIFeatures(Tour.find(), req.query)
+            .filter()
+            .sort()
+            .project()
+            .paginate();
         // execute query
-        const tours = await query;
+        const tours = await apiFeatures.query;
         res.status(200).json({
             status: "success",
             results: tours.length,
