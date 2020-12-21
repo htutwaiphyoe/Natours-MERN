@@ -81,6 +81,11 @@ tourSchema.pre(/^find/, function (next) {
     this.find({ secret: { $ne: true } });
     next();
 });
+
+tourSchema.pre("aggregate", function (next) {
+    this.pipeline().unshift({ $match: { secret: { $ne: true } } });
+    next();
+});
 const Tour = mongoose.model("Tour", tourSchema);
 
 module.exports = Tour;
