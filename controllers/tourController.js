@@ -49,7 +49,7 @@ exports.addNewTour = async (req, res) => {
         });
     }
 };
-exports.getSingleTour = async (req, res) => {
+exports.getSingleTour = async (req, res, next) => {
     try {
         const tour = await Tour.findById(req.params.id);
         res.status(200).json({
@@ -59,10 +59,14 @@ exports.getSingleTour = async (req, res) => {
             },
         });
     } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: err.message,
-        });
+        // res.status(500).json({
+        //     status: "error",
+        //     message: err.message,
+        // });
+
+        err.statusCode = 404;
+        err.status = "fail";
+        next(err);
     }
 };
 exports.updateSingleTour = async (req, res) => {
