@@ -7,6 +7,7 @@ const tourRouter = require("./routers/tourRouter");
 const userRouter = require("./routers/userRouter");
 const AppError = require("./utils/AppError");
 const errorController = require("./controllers/errorController");
+
 const app = express();
 
 // Middlewares
