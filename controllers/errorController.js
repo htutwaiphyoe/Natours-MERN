@@ -34,6 +34,13 @@ const handleDuplicateKeyError = (err) => {
     const message = `${Object.keys(err.keyValue).join(" ")}: ${err.keyValue.name} already exists.`;
     return new AppError(message, 400);
 };
+
+const handleValidationError = (err) => {
+    const message = `${Object.values(err.errors)
+        .map((value) => value.message)
+        .join(". ")}`;
+    return new AppError(message, 400);
+};
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
@@ -42,6 +49,7 @@ module.exports = (err, req, res, next) => {
         sendDevError(err, res);
     } else if (process.env.NODE_ENV === "production") {
         if (err.name === "CastError") err = handleCastError(err);
+        if (err.name === "ValidationError") err = handleValidationError(err);
         if (err.code === 11000) err = handleDuplicateKeyError(err);
         sendProdError(err, res);
     }
