@@ -2,6 +2,7 @@
 const Tour = require("../models/TourModel");
 const APIFeatures = require("../utils/APIFeatures");
 const catchError = require("../utils/catchError");
+const AppError = require("../utils/AppError");
 
 exports.getTop5 = (req, res, next) => {
     req.query.limit = "5";
@@ -9,7 +10,7 @@ exports.getTop5 = (req, res, next) => {
     req.query.fields = "name,price,duration,ratingsAverage,difficulty,summary";
     next();
 };
-exports.getAllTours = catchError(async (req, res) => {
+exports.getAllTours = catchError(async (req, res, next) => {
     // get query
     const apiFeatures = new APIFeatures(Tour.find(), req.query)
         .filter()
@@ -38,6 +39,9 @@ exports.addNewTour = catchError(async (req, res, next) => {
 });
 exports.getSingleTour = catchError(async (req, res, next) => {
     const tour = await Tour.findById(req.params.id);
+    if (!tour) {
+        return next(new AppError("No tour found with that id", 404));
+    }
     res.status(200).json({
         status: "success",
         data: {
@@ -45,11 +49,15 @@ exports.getSingleTour = catchError(async (req, res, next) => {
         },
     });
 });
-exports.updateSingleTour = catchError(async (req, res) => {
+exports.updateSingleTour = catchError(async (req, res, next) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
         runValidators: true,
         new: true,
     });
+
+    if (!tour) {
+        return next(new AppError("No tour found with that id", 404));
+    }
     res.status(201).json({
         status: "success",
         data: {
@@ -58,15 +66,18 @@ exports.updateSingleTour = catchError(async (req, res) => {
     });
 });
 
-exports.deleteSingleTour = catchError(async (req, res) => {
-    await Tour.findByIdAndDelete(req.params.id);
+exports.deleteSingleTour = catchError(async (req, res, next) => {
+    const tour = await Tour.findByIdAndDelete(req.params.id);
+    if (!tour) {
+        return next(new AppError("No tour found with that id", 404));
+    }
     res.status(204).json({
         status: "success",
         data: null,
     });
 });
 
-exports.getTourStatistics = catchError(async (req, res) => {
+exports.getTourStatistics = catchError(async (req, res, next) => {
     const statistics = await Tour.aggregate([
         {
             $match: { ratingsAverage: { $gte: 4.5 } },
@@ -95,7 +106,7 @@ exports.getTourStatistics = catchError(async (req, res) => {
     });
 });
 
-exports.getMonthlyPlan = catchError(async (req, res) => {
+exports.getMonthlyPlan = catchError(async (req, res, next) => {
     const plans = await Tour.aggregate([
         {
             $unwind: "$startDates",
