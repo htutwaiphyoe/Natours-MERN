@@ -2,6 +2,10 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
+process.on("uncaughtException", (err) => {
+    console.error("Uncaught exceptions occurred", err);
+    process.exit(1);
+});
 dotenv.config({ path: `./.env` });
 // Own modules
 const app = require("./app");
@@ -14,14 +18,25 @@ mongoose.connect(dbString, {
     useFindAndModify: false,
 });
 
-mongoose.connection.on("connected", () => {
-    console.log("Database connection established successfully");
-});
-
-mongoose.connection.on("error", (err) => {
-    console.log("Database connection failed");
-});
+if (process.env.NODE_ENV === "development") {
+    mongoose.connection.on("connected", () => {
+        console.error("Database connection established successfully");
+    });
+    mongoose.connection.on("disconnected", (err) => {
+        console.error("Database connection failed");
+    });
+    mongoose.connection.on("error", (err) => {
+        console.error("Database connection failed");
+    });
+}
 
 // Server configuration
 const port = process.env.PORT || 8000;
-app.listen(port, () => {});
+const server = app.listen(port, () => {});
+
+process.on("unhandledRejection", (err) => {
+    console.error("Unhandled Rejection occurred", err);
+    server.close(() => {
+        process.exit(1);
+    });
+});
